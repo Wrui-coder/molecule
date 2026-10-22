@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local embedded Postgres data dir
+.pglite-data
+
+# local scratch (probe scripts, captured streams)
+.dev
