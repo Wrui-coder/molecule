@@ -113,9 +113,11 @@ DATABASE_URL=postgres://...        # 启用 Neon 驱动，并执行 scripts/db-p
 ANTHROPIC_BASE_URL=https://...     # Anthropic 兼容端点（官方或中转）
 ANTHROPIC_AUTH_TOKEN=sk-...        # 鉴权令牌（或 ANTHROPIC_API_KEY）
 ANTHROPIC_MODEL=deepseek-v4-flash  # 模型名
-LLM_MAX_TOKENS=16000               # 总 token 预算
-LLM_THINKING_BUDGET=4000           # 推理 token 预算
+LLM_MAX_TOKENS=64000               # 整个回复（含推理）的 token 上限，代码默认 32000
+LLM_THINKING_BUDGET=2000           # 推理 token 上限，设 0 则不限制
 ```
+
+以上变量可参考仓库根目录的 `.env.example`（复制为 `.env.local` 后填写）。
 
 应用 DDL（建表）见 `lib/db/ddl.ts`，可执行：
 
