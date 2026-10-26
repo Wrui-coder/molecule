@@ -33,7 +33,9 @@ function pgliteDir(): string {
 }
 
 async function connect(): Promise<DB> {
-  const url = process.env.DATABASE_URL;
+  // Same reasoning as the model envs: a pasted connection string can carry a
+  // trailing newline, and a newline in a URL is not a parse error you can see.
+  const url = process.env.DATABASE_URL?.trim();
 
   if (url) {
     const { neon } = await import("@neondatabase/serverless");

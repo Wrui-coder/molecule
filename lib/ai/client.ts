@@ -1,8 +1,16 @@
 import Anthropic from "@anthropic-ai/sdk";
 
+/**
+ * Values typed into a hosting dashboard routinely arrive with a stray space or
+ * newline pasted around them. A model name with a leading space is a *different
+ * model* as far as the gateway is concerned, and it answers with a 403 about a
+ * tier that reads as if the model were unavailable. Trim everything we read.
+ */
+const env = (name: string): string | undefined => process.env[name]?.trim() || undefined;
+
 /** Model + endpoint come from the environment so the same code runs against a
  *  local relay, a self-hosted gateway, or the Anthropic API unchanged. */
-export const MODEL = process.env.ANTHROPIC_MODEL ?? "deepseek-v4-flash";
+export const MODEL = env("ANTHROPIC_MODEL") ?? "deepseek-v4-flash";
 
 /**
  * Budget for the *whole* reply, thinking included.
@@ -13,7 +21,7 @@ export const MODEL = process.env.ANTHROPIC_MODEL ?? "deepseek-v4-flash";
  * answer, it is a run that spends every last token thinking and returns
  * nothing at all.
  */
-export const MAX_TOKENS = Number(process.env.LLM_MAX_TOKENS ?? 32000);
+export const MAX_TOKENS = Number(env("LLM_MAX_TOKENS") ?? 32000);
 
 /**
  * Optional cap on the reasoning block. Without one, some models will think for
@@ -21,7 +29,7 @@ export const MAX_TOKENS = Number(process.env.LLM_MAX_TOKENS ?? 32000);
  * with a fixed `max_tokens`, a way to starve the actual answer. Set to 0 to
  * leave the model's own default alone.
  */
-export const THINKING_BUDGET_TOKENS = Number(process.env.LLM_THINKING_BUDGET ?? 2000);
+export const THINKING_BUDGET_TOKENS = Number(env("LLM_THINKING_BUDGET") ?? 2000);
 
 export const thinkingConfig = (): { type: "enabled"; budget_tokens: number } | undefined =>
   THINKING_BUDGET_TOKENS > 0 && THINKING_BUDGET_TOKENS < MAX_TOKENS
@@ -59,13 +67,13 @@ export function describeError(error: unknown): string {
 }
 
 export function getClient(): Anthropic {
-  const apiKey = process.env.ANTHROPIC_AUTH_TOKEN ?? process.env.ANTHROPIC_API_KEY;
+  const apiKey = env("ANTHROPIC_AUTH_TOKEN") ?? env("ANTHROPIC_API_KEY");
   if (!apiKey) {
     throw new Error("缺少模型凭证：请配置 ANTHROPIC_AUTH_TOKEN 或 ANTHROPIC_API_KEY");
   }
   return new Anthropic({
     apiKey,
-    baseURL: process.env.ANTHROPIC_BASE_URL,
+    baseURL: env("ANTHROPIC_BASE_URL"),
     // Relay gateways are not always happy with SDK retries on long streams.
     maxRetries: 1,
   });
