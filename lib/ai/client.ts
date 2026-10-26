@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 /** Model + endpoint come from the environment so the same code runs against a
  *  local relay, a self-hosted gateway, or the Anthropic API unchanged. */
-export const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
+export const MODEL = process.env.ANTHROPIC_MODEL ?? "deepseek-v4-flash";
 
 /**
  * Budget for the *whole* reply, thinking included.
