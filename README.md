@@ -4,7 +4,7 @@
 >
 > 参考案例：[atoms-demo.pub.atoms.world](https://atoms-demo.pub.atoms.world/) —— 用自然语言描述一个应用，AI Agent 自动生成可运行的网页，并支持实时预览、对话式迭代、版本管理与导出。
 
-**线上可体验地址：** `https://molecule-orpin.vercel.app`
+**线上可体验地址：** <https://moleculeapp.xyz>
 
 ---
 

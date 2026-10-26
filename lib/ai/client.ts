@@ -28,6 +28,36 @@ export const thinkingConfig = (): { type: "enabled"; budget_tokens: number } | u
     ? { type: "enabled", budget_tokens: THINKING_BUDGET_TOKENS }
     : undefined;
 
+/**
+ * Turn whatever the SDK threw into one line a person can read.
+ *
+ * The SDK folds the entire response body into `error.message`, so a refused
+ * request reaches the UI as `403 {"type":"error","error":{...}}`. The gateway's
+ * own sentence is in there, wrapped in the JSON — dig it out, and keep the
+ * status as a suffix for when it matters.
+ */
+export function describeError(error: unknown): string {
+  const raw = error instanceof Error ? error.message : String(error);
+  const json = raw.match(/\{[\s\S]*\}/);
+  if (!json) return raw;
+  try {
+    // Control characters are illegal inside JSON strings; relays that hand-build
+    // their error bodies send them anyway. Swap for spaces before parsing.
+    const body = JSON.parse(json[0].replace(/[\u0000-\u001f]/g, " ")) as {
+      error?: { message?: unknown };
+      message?: unknown;
+    };
+    const inner = body.error?.message ?? body.message;
+    if (typeof inner === "string" && inner.trim()) {
+      const status = raw.slice(0, json.index).trim();
+      return status ? `${inner.trim()}（${status}）` : inner.trim();
+    }
+  } catch {
+    // Not JSON after all — show it unchanged rather than swallow it.
+  }
+  return raw;
+}
+
 export function getClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_AUTH_TOKEN ?? process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {

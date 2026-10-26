@@ -169,6 +169,9 @@ export default function Workspace({
           aborted = true;
         } else {
           setError(err instanceof Error ? err.message : "生成失败，请重试");
+          // On a narrow screen the preview tab is the one on show, so the
+          // explanation would render in the pane nobody is looking at.
+          setMobileView("chat");
         }
       } finally {
         if (previewTimer.current !== null) window.clearTimeout(previewTimer.current);

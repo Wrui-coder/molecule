@@ -1,3 +1,4 @@
+import { describeError } from "@/lib/ai/client";
 import { generateApp } from "@/lib/ai/run";
 import { addMessage, appendVersion, getApp, setStatus } from "@/lib/repo";
 
@@ -85,7 +86,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           send({ t: "done", version: version.version, summary, durationMs: event.durationMs });
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : "生成失败，请重试";
+        const message = describeError(error);
         await setStatus(id, "error").catch(() => {});
         send({ t: "error", d: message });
       } finally {
